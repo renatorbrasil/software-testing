@@ -51,6 +51,7 @@ public class PaymentService {
                     payment.getSource()));
         }
 
+        payment.setCustomerId(customerId);
         paymentRepository.save(payment);
 
         // TODO: send sms
