@@ -26,9 +26,6 @@ class CustomerRegistrationServiceTest {
     @Mock
     private CustomerRepository customerRepository;
 
-    @Captor
-    private ArgumentCaptor<Customer> customerArgumentCaptor;
-
     private CustomerRegistrationService underTest;
 
     @BeforeEach
@@ -54,7 +51,6 @@ class CustomerRegistrationServiceTest {
 
         // Then should call save method
         then(customerRepository).should().save(any());
-
     }
 
     @Test
@@ -94,6 +90,5 @@ class CustomerRegistrationServiceTest {
                 .isInstanceOf(BusinessException.class);
 
         then(customerRepository).should(never()).save(any());
-
     }
 }

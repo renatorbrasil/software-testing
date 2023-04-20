@@ -6,6 +6,7 @@ import com.amigoscode.testing.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -26,6 +27,8 @@ class PaymentServiceTest {
     @Mock private CustomerRepository customerRepository;
     @Mock private PaymentRepository paymentRepository;
     @Mock private CardPaymentCharger cardPaymentCharger;
+
+    @Captor private ArgumentCaptor<Payment> paymentCaptor;
 
     private PaymentService underTest;
 
@@ -64,13 +67,9 @@ class PaymentServiceTest {
         // When
         underTest.chargeCard(customerId, paymentRequest);
 
-        // Then
-        ArgumentCaptor<Payment> paymentArgumentCaptor =
-                ArgumentCaptor.forClass(Payment.class);
+        then(paymentRepository).should().save(paymentCaptor.capture());
 
-        then(paymentRepository).should().save(paymentArgumentCaptor.capture());
-
-        Payment paymentCaptured = paymentArgumentCaptor.getValue();
+        Payment paymentCaptured = paymentCaptor.getValue();
         assertThat(paymentCaptured).isEqualToIgnoringGivenFields
                 (paymentRequest.getPayment(), "customerId");
         assertThat(paymentCaptured.getCustomerId()).isEqualTo(customerId);

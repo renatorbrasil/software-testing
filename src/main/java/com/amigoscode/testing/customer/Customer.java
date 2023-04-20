@@ -33,4 +33,12 @@ public class Customer {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
+    public boolean isSame(Customer other) {
+        return getName().equals(other.getName());
+    }
+
+    public boolean isDifferentFrom(Customer other) {
+        return !isSame(other);
+    }
+
 }

@@ -1,20 +1,14 @@
 package com.amigoscode.testing.customer;
 
 import com.amigoscode.testing.exception.BusinessException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
+@RequiredArgsConstructor
 public class CustomerRegistrationService {
 
     private final CustomerRepository customerRepository;
-
-    @Autowired
-    public CustomerRegistrationService(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
-    }
 
     public void registerNewCustomer(CustomerRegistrationRequest request) {
         Customer customerToInsert = request.getCustomer();
@@ -25,8 +19,7 @@ public class CustomerRegistrationService {
 
         if (customerOptional.isEmpty()) {
             customerRepository.save(customerToInsert);
-        } else if (!customerToInsert.getName()
-                .equalsIgnoreCase(customerOptional.get().getName())) {
+        } else if (customerToInsert.isDifferentFrom(customerOptional.get())) {
             throw new BusinessException
                     (String.format("Phone number %s is already taken.", phoneNumber));
         }
