@@ -22,9 +22,7 @@ class CustomerRegistrationServiceTest {
     private final String ALT_NAME = "0001";
     private final String PHONE_NUMBER = "0000";
 
-
-    @Mock
-    private CustomerRepository customerRepository;
+    @Mock private CustomerRepository customerRepository;
 
     private CustomerRegistrationService underTest;
 
