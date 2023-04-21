@@ -1,25 +1,23 @@
 package com.amigoscode.testing.customer;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@Getter
+@RequiredArgsConstructor
 public class CustomerRegistrationRequest {
 
-    private final Customer customer;
+    private final String name;
+    private final String phoneNumber;
 
     public CustomerRegistrationRequest(
-            @JsonProperty("customer") Customer customer
+            Customer customer
     ) {
-        this.customer = customer;
+        this.name = customer.getName();
+        this.phoneNumber = customer.getPhoneNumber();
     }
 
     public Customer getCustomer() {
-        return customer;
-    }
-
-    @Override
-    public String toString() {
-        return "CustomerRegistrationRequest{" +
-                "customer=" + customer +
-                '}';
+        return new Customer(null, name, phoneNumber);
     }
 }

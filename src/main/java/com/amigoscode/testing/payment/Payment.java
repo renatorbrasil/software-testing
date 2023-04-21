@@ -9,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.math.BigDecimal;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -20,8 +19,7 @@ import java.util.UUID;
 public class Payment {
 
     @Id
-    @GeneratedValue
-    private Long paymentId;
+    private UUID id;
 
     private UUID customerId;
 

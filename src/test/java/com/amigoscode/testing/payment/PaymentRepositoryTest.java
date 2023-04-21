@@ -19,7 +19,7 @@ class PaymentRepositoryTest {
 
     Payment defaultPayment() {
         return new Payment(
-                1L,
+                UUID.randomUUID(),
                 UUID.randomUUID(),
                 new BigDecimal("10.00"),
                 Currency.USD, "card123",
@@ -34,7 +34,24 @@ class PaymentRepositoryTest {
         // When
         underTest.save(payment);
         // Then
-        var paymentOptional = underTest.findById(payment.getPaymentId());
+        var paymentOptional = underTest.findById(payment.getId());
+        assertThat(paymentOptional)
+                .isPresent()
+                .hasValueSatisfying(p ->
+                        assertThat(p).isEqualToComparingFieldByField(payment));
+    }
+
+    @Test
+    void itShouldFindPaymentByIdAndCustomerId() {
+        // Given
+        var payment = defaultPayment();
+        // When
+        underTest.save(payment);
+
+        // Then
+        var paymentOptional = underTest.findByIdAndCustomerId
+                (payment.getId(), payment.getCustomerId());
+
         assertThat(paymentOptional)
                 .isPresent()
                 .hasValueSatisfying(p ->

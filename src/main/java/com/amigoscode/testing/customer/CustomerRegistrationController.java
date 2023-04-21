@@ -1,10 +1,8 @@
 package com.amigoscode.testing.customer;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -16,10 +14,11 @@ public class CustomerRegistrationController {
     private final CustomerRegistrationService customerRegistrationService;
 
     @PutMapping
-    public void registerNewCustomer(
+    public CustomerRegistrationResponse registerNewCustomer(
             @Valid @RequestBody CustomerRegistrationRequest request
     ) {
-        customerRegistrationService.registerNewCustomer(request);
+        var customerId = customerRegistrationService.registerNewCustomer(request);
+        return new CustomerRegistrationResponse(customerId);
     }
 
 }

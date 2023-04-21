@@ -2,8 +2,8 @@ package com.amigoscode.testing.payment;
 
 import com.amigoscode.testing.customer.CustomerRepository;
 import com.amigoscode.testing.exception.BusinessException;
+import com.amigoscode.testing.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,12 +19,13 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final CardPaymentCharger cardPaymentCharger;
 
-    void chargeCard(UUID customerId, PaymentRequest paymentRequest) {
+    public UUID chargeCard(PaymentRequest paymentRequest) {
+        var payment = paymentRequest.getPayment();
+        var customerId = payment.getCustomerId();
+
         customerRepository.findById(customerId)
                 .orElseThrow(() -> new BusinessException
                         (String.format("Customer of id %s does not exist.", customerId)));
-
-        var payment = paymentRequest.getPayment();
 
         boolean isCurrencySupported = ACCEPTED_CURRENCIES.contains(payment.getCurrency());
         if (!isCurrencySupported) {
@@ -43,9 +44,20 @@ public class PaymentService {
                     payment.getSource()));
         }
 
-        payment.setCustomerId(customerId);
+        var paymentId = UUID.randomUUID();
+        payment.setId(paymentId);
         paymentRepository.save(payment);
 
         // TODO: send sms
+
+        return paymentId;
+    }
+
+    public Payment findByIdAndCustomerId(UUID paymentId, UUID customerId) {
+        return paymentRepository
+                .findByIdAndCustomerId(paymentId, customerId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Payment of id [%s] and customerId [%s] not found",
+                                paymentId, customerId)));
     }
 }

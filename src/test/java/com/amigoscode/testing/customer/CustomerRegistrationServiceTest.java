@@ -35,7 +35,7 @@ class CustomerRegistrationServiceTest {
     @Test
     void itShouldSaveNewCustomer() {
         // Given a customer
-        Customer customer = new Customer(UUID.randomUUID(), MAIN_NAME, PHONE_NUMBER);
+        Customer customer = new Customer(null, MAIN_NAME, PHONE_NUMBER);
 
         // ... a request
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(customer);
@@ -54,7 +54,7 @@ class CustomerRegistrationServiceTest {
     @Test
     void itShouldNotSaveCustomerWhenCustomerExists() {
         // Given a customer
-        Customer customer = new Customer(UUID.randomUUID(), MAIN_NAME, PHONE_NUMBER);
+        Customer customer = new Customer(null, MAIN_NAME, PHONE_NUMBER);
 
         // ... a request
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(customer);
@@ -72,13 +72,13 @@ class CustomerRegistrationServiceTest {
     @Test
     void itShouldThrowWhenPhoneNumberIsTaken() {
         // Given a customer
-        Customer customer = new Customer(UUID.randomUUID(), MAIN_NAME, PHONE_NUMBER);
+        Customer customer = new Customer(null, MAIN_NAME, PHONE_NUMBER);
 
         // ... a request
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(customer);
 
         // ... an existing customer is returned
-        Customer existingCustomer = new Customer(UUID.randomUUID(), ALT_NAME, PHONE_NUMBER);
+        Customer existingCustomer = new Customer(null, ALT_NAME, PHONE_NUMBER);
         given(customerRepository.findByPhoneNumber(PHONE_NUMBER))
                 .willReturn(Optional.of(existingCustomer));
 

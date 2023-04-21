@@ -1,10 +1,8 @@
 package com.amigoscode.testing.payment;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -15,11 +13,19 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @RequestMapping("/{customerId}")
-    public void makePayment(
-            @PathVariable("customerId") UUID customerId,
+    @PostMapping
+    public PaymentResponse makePayment(
             @RequestBody PaymentRequest request
     ) {
-        paymentService.chargeCard(customerId, request);
+        var paymentId = paymentService.chargeCard(request);
+        return new PaymentResponse(paymentId);
     }
+
+/*    @GetMapping("/{customerId}/{paymentId}")
+    public Payment getPaymentById(
+            @PathVariable("customerId") UUID customerId,
+            @PathVariable("paymentId") UUID paymentId
+    ) {
+
+    }*/
 }

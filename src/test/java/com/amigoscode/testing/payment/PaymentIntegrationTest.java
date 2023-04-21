@@ -12,16 +12,22 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class PaymentIntegrationTest {
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,12 +44,30 @@ class PaymentIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(Objects.requireNonNull(objectToJson(customerRegRequest))));
 
+        var paymentId = UUID.randomUUID();
+        var payment = new Payment(
+                paymentId,
+                customerId,
+                new BigDecimal("100.00"),
+                Currency.GBP,
+                "x0x0x0",
+                "Description");
+        var paymentRequest = new PaymentRequest(payment);
 
         // When
-
+        ResultActions paymentResultActions = mockMvc.perform(
+                post("/api/v1/payment")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(Objects.requireNonNull(objectToJson(paymentRequest))));
 
         // Then
         customerRegResultActions.andExpect(status().isOk());
+        paymentResultActions.andExpect(status().isOk());
+
+        assertThat(paymentRepository.findById(paymentId))
+                .isPresent()
+                .hasValueSatisfying(p ->
+                        assertThat(p).isEqualToComparingFieldByField(payment));
     }
 
     private String objectToJson(Object object) {
