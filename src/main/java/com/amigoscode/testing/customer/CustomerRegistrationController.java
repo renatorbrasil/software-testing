@@ -1,7 +1,7 @@
 package com.amigoscode.testing.customer;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +15,7 @@ public class CustomerRegistrationController {
 
     private final CustomerRegistrationService customerRegistrationService;
 
-    @PutMapping
+    @PostMapping
     public CustomerRegistrationResponse registerNewCustomer(
             @Valid @RequestBody CustomerRegistrationRequest request
     ) {

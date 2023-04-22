@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
@@ -16,7 +17,7 @@ public class PaymentController {
 
     @PostMapping
     public PaymentResponse makePayment(
-            @RequestBody PaymentRequest request
+            @RequestBody @Valid PaymentRequest request
     ) {
         var paymentId = paymentService.chargeCard(request);
         return new PaymentResponse(paymentId);
