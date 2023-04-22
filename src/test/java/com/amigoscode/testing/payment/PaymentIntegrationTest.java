@@ -25,9 +25,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class PaymentIntegrationTest {
 
     @Autowired
-    private PaymentRepository paymentRepository;
-
-    @Autowired
     private MockMvc mockMvc;
 
     @Test
