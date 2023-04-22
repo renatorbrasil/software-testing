@@ -2,6 +2,7 @@ package com.amigoscode.testing.payment;
 
 import com.amigoscode.testing.customer.Customer;
 import com.amigoscode.testing.customer.CustomerRegistrationRequest;
+import com.amigoscode.testing.customer.CustomerRegistrationResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -14,13 +15,10 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -35,8 +33,7 @@ class PaymentIntegrationTest {
     @Test
     void itShouldCreatePaymentSuccessfully() throws Exception {
         // Given
-        UUID customerId = UUID.randomUUID();
-        var customer = new Customer(customerId, "Mordor", "0000000");
+        var customer = new Customer(null, "Mordor", "0000000");
         var customerRegRequest = new CustomerRegistrationRequest(customer);
 
         ResultActions customerRegResultActions = mockMvc.perform(
@@ -44,9 +41,16 @@ class PaymentIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(Objects.requireNonNull(objectToJson(customerRegRequest))));
 
-        var paymentId = UUID.randomUUID();
+        CustomerRegistrationResponse customerResponse =
+                new ObjectMapper().readValue(customerRegResultActions
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(), CustomerRegistrationResponse.class);
+
+        var customerId = customerResponse.getId();
+
         var payment = new Payment(
-                paymentId,
+                null,
                 customerId,
                 new BigDecimal("100.00"),
                 Currency.GBP,
@@ -55,27 +59,38 @@ class PaymentIntegrationTest {
         var paymentRequest = new PaymentRequest(payment);
 
         // When
-        ResultActions paymentResultActions = mockMvc.perform(
+        ResultActions newPaymentResultActions = mockMvc.perform(
                 post("/api/v1/payment")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(Objects.requireNonNull(objectToJson(paymentRequest))));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(Objects.requireNonNull(objectToJson(paymentRequest))));
+
+        PaymentResponse paymentResponse =
+                new ObjectMapper().readValue(newPaymentResultActions
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(), PaymentResponse.class);
+
+        var paymentId = paymentResponse.getId();
+
+        ResultActions paymentActions = mockMvc.perform(
+                get("/api/v1/payment/{customerId}/{paymentId}", customerId, paymentId)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        Payment paymentReturned =
+                new ObjectMapper().readValue(paymentActions
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(), Payment.class);
 
         // Then
-        customerRegResultActions.andExpect(status().isOk());
-        paymentResultActions.andExpect(status().isOk());
-
-        assertThat(paymentRepository.findById(paymentId))
-                .isPresent()
-                .hasValueSatisfying(p ->
-                        assertThat(p).isEqualToComparingFieldByField(payment));
+        assertThat(paymentReturned).isEqualToIgnoringGivenFields(payment, "id");
     }
 
     private String objectToJson(Object object) {
         try {
             return new ObjectMapper().writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            fail("Failed to convert object to JSON");
-            return null;
+            return fail("Failed to convert object to JSON");
         }
     }
 }

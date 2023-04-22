@@ -1,10 +1,11 @@
 package com.amigoscode.testing.payment;
 
+import com.amigoscode.testing.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/payment")
@@ -21,11 +22,16 @@ public class PaymentController {
         return new PaymentResponse(paymentId);
     }
 
-/*    @GetMapping("/{customerId}/{paymentId}")
-    public Payment getPaymentById(
+    @GetMapping("/{customerId}/{paymentId}")
+    public ResponseEntity<Payment> getPaymentById(
             @PathVariable("customerId") UUID customerId,
             @PathVariable("paymentId") UUID paymentId
     ) {
-
-    }*/
+        try {
+            var payment = paymentService.findByIdAndCustomerId(paymentId, customerId);
+            return ResponseEntity.ok(payment);
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
