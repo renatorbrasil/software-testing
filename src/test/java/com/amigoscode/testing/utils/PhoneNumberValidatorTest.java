@@ -17,13 +17,13 @@ class PhoneNumberValidatorTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-            "+4470000000000, true",
-            "4470000000000,  false",
-            "3170000000000,  false",
-            "447000000000,   false",
-            "44700000000000, false",
-            ",               false",
-            " ,              false"
+            "+4470000000000,  true",
+            "4470000000000,   false",
+            "+3170000000000,  false",
+            "+44700000000,    false",
+            "+44700000000000, false",
+            ",                false",
+            " ,               false"
     }, emptyValue = " ")
     void itShouldValidatePhoneNumber(String phoneNumber, boolean expected) {
         // When

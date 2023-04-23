@@ -31,7 +31,7 @@ class PaymentIntegrationTest {
     private MockMvc mockMvc;
 
     private UUID registerCustomerAndReturnId() throws Exception {
-        var customer = new Customer(null, "Mordor", "0000000");
+        var customer = new Customer(null, "Mordor", "+4470000000000");
         var customerRegRequest = new CustomerRegistrationRequest(customer);
 
         ResultActions customerRegResultActions = mockMvc.perform(
